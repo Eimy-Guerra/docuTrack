@@ -57,9 +57,12 @@ class Certificate(Base):
     apellido_usuario = Column(String, nullable=False)
     lugar_estudio = Column(String, nullable=True)
     fecha_inicio_estudios = Column(Date, nullable=True)
+    fecha_fin_estudios = Column(Date, nullable=True)  
+    fecha_nacimiento = Column(Date, nullable=True)    
 
     request_id = Column(Integer, ForeignKey("requests.id"))
     request = relationship("Request", back_populates="certificate")
+
 
 
 class Admin(Base):
