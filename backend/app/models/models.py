@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Enum, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database.database import Base
 import enum
 
 class RequestType(str, enum.Enum):
@@ -65,10 +65,3 @@ class Certificate(Base):
 
 
 
-class Admin(Base):
-    __tablename__ = "admins"
-
-    id = Column(Integer, primary_key=True, index=True)
-    usuario = Column(String, unique=True, index=True)
-    contraseña = Column(String, nullable=False)
-    rol = Column(String, unique=True, nullable=False)  # Verificación única por admin
