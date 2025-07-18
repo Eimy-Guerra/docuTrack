@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from app.database.database import engine
-from app.models import user
+from app.models import models
 from app.schemas import UserCreate
 
 app = FastAPI()
 
-user.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():
