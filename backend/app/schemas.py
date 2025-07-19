@@ -1,13 +1,23 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-import enum
 from datetime import date
+import enum
 
 # ----------- ENUM -----------
 
 class RequestType(str, enum.Enum):
     nacimiento = "cert_nacimiento"
     estudios = "cert_estudios"
+
+# ----------- AUTH SCHEMAS -----------
+
+class LoginUser(BaseModel):
+    correo: str
+    contraseña: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 # ----------- USER SCHEMAS -----------
 

@@ -3,9 +3,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Optional
-
 from app.database.database import SessionLocal
 from app.models import models
 from app import schemas
@@ -35,7 +34,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
+        user_id = int(payload.get("sub"))
         if user_id is None:
             raise credentials_exception
     except JWTError:
@@ -46,6 +45,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     return user
 
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
 # ----------- UTILS -----------
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -53,6 +62,10 @@ def hash_password(password: str) -> str:
 # ----------- CREATE USER -----------
 @router.post("/users/", response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(models.User).filter(models.User.correo == user.correo).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="El correo ya está registrado.")
+
     db_user = models.User(
         nombre=user.nombre,
         correo=user.correo,
@@ -129,3 +142,18 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"mensaje": f"Usuario con ID {user_id} eliminado correctamente"}
+
+
+# ----------- TOKEN -----------
+@router.post("/token", response_model=schemas.Token)
+def login(
+    user_login: schemas.LoginUser,
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.correo == user_login.correo).first()
+    if not user or not verify_password(user_login.contraseña, user.contraseña):
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+
+    access_token = create_access_token(data={"sub": str(user.id)})
+    return {"access_token": access_token, "token_type": "bearer"}
+
