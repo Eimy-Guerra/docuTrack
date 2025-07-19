@@ -12,8 +12,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, nullable=False)
-    correo = Column(String, unique=True, index=True)
+    correo = Column(String, unique=True, index=True, nullable=False)
     contraseña = Column(String, nullable=False)
+    rol = Column(String, nullable=False)
 
     requests = relationship("Request", back_populates="usuario")
 

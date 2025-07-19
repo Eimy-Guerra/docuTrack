@@ -17,6 +17,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     contraseña: str
+    rol: str
 
 class UserOut(UserBase):
     id: int
