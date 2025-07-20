@@ -54,6 +54,7 @@ class RequestBase(BaseModel):
     nombre_usuario: str
     apellido_usuario: str
     fecha_nacimiento: Optional[date] = None
+    lugar_estudio: Optional[str] = None 
     fecha_inicio_estudios: Optional[date] = None
     fecha_fin_estudios: Optional[date] = None
     estado: str
@@ -73,8 +74,7 @@ class RequestOut(RequestBase):
 
     class Config:
         orm_mode = True
-    class Config:
-        orm_mode = True
+    
 
 # ----------- DOCUMENT SCHEMAS -----------
 

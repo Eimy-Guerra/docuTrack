@@ -1,11 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from app.database.database import get_db
-from app.models import Request, User
+from app.models import Request, User, EstadoRequest
 from app.schemas import RequestCreate, RequestOut
 from app.auth.auth_utils import get_current_user
+from app import schemas
+
+
 
 router = APIRouter()
+
+@router.get("/requests/", response_model=list[schemas.RequestOut])
+def listar_solicitudes(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    if current_user.rol != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+    
+    return db.query(Request).all()
 
 @router.post("/requests/", response_model=RequestOut)
 def crear_solicitud(
@@ -33,3 +46,69 @@ def crear_solicitud(
     db.refresh(nueva_solicitud)
 
     return nueva_solicitud
+
+@router.get("/requests/{request_id}", response_model=schemas.RequestOut)
+def obtener_solicitud_individual(
+    request_id: int = Path(..., title="ID de la solicitud"),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    if current_user.rol != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado. Solo administradores.")
+
+    solicitud = db.query(Request).filter(Request.id == request_id).first()
+
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada.")
+
+    return solicitud
+
+@router.put("/requests/{id}/validar", response_model=schemas.RequestOut)
+def validar_solicitud(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    if current_user.rol != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado.")
+
+    solicitud = db.query(Request).filter(Request.id == id).first()
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada.")
+
+    solicitud.estado = EstadoRequest.en_validacion
+    db.commit()
+    db.refresh(solicitud)
+
+    return solicitud
+
+@router.put("/requests/{id}/aprobar", response_model=schemas.RequestOut)
+def aprobar_solicitud(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if current_user.rol != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado.")
+
+    solicitud = db.query(Request).filter(Request.id == id).first()
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada.")
+
+    solicitud.estado = EstadoRequest.aprobado
+    db.commit()
+    db.refresh(solicitud)
+
+    return solicitud
+
+@router.put("/requests/{id}/corregir", response_model=schemas.RequestOut)
+def solicitar_correccion(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    if current_user.rol != "admin":
+        raise HTTPException(status_code=403, detail="Acceso denegado.")
+
+    solicitud = db.query(Request).filter(Request.id == id).first()
+    if not solicitud:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada.")
+
+    solicitud.estado = EstadoRequest.correccion
+    db.commit()
+    db.refresh(solicitud)
+
+    return solicitud
+

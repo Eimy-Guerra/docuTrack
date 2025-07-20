@@ -1,1 +1,1 @@
-from .models import User, Request, Document, Certificate, RequestType
+from .models import User, Request, Document, Certificate, RequestType, EstadoRequest

@@ -7,6 +7,13 @@ class RequestType(str, enum.Enum):
     nacimiento = "cert_nacimiento"
     estudios = "cert_estudios"
 
+class EstadoRequest(str, enum.Enum):
+    pendiente = "pendiente"
+    en_validacion = "en_validación"
+    aprobado = "aprobado"
+    rechazado = "rechazado"
+    correccion = "corrección"
+
 class User(Base):
     __tablename__ = "users"
 
