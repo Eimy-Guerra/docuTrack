@@ -27,9 +27,10 @@ class Request(Base):
     nombre_usuario = Column(String, nullable=False)
     apellido_usuario = Column(String, nullable=False)
     fecha_nacimiento = Column(Date, nullable=True)
+    lugar_estudio = Column(String, nullable=True)
     fecha_inicio_estudios = Column(Date, nullable=True)
     fecha_fin_estudios = Column(Date, nullable=True)
-    estado = Column(String, nullable=False)
+    estado = Column(String, nullable=False, default="pendiente")
 
     user_id = Column(Integer, ForeignKey("users.id"))
     usuario = relationship("User", back_populates="requests")

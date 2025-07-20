@@ -1,24 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
-from typing import Optional
 from app.database.database import SessionLocal
 from app.models import models
 from app import schemas
+from app.auth.auth_utils import get_current_user, create_access_token  # ✅ Importar desde nuevo módulo
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ----------- Seguridad JWT -----------
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-SECRET_KEY = "tu_clave_secreta"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
+# ----------- DB DEPENDENCY -----------
 def get_db():
     db = SessionLocal()
     try:
@@ -26,36 +17,10 @@ def get_db():
     finally:
         db.close()
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="No se pudo validar el token.",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub"))
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if user is None:
-        raise credentials_exception
-    return user
-
+# ----------- UTILS -----------
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-# ----------- UTILS -----------
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -143,7 +108,6 @@ def delete_user(
     db.commit()
     return {"mensaje": f"Usuario con ID {user_id} eliminado correctamente"}
 
-
 # ----------- TOKEN -----------
 @router.post("/token", response_model=schemas.Token)
 def login(
@@ -156,4 +120,5 @@ def login(
 
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
+
 

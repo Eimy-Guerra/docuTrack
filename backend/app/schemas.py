@@ -4,10 +4,14 @@ from datetime import date
 import enum
 
 # ----------- ENUM -----------
-
 class RequestType(str, enum.Enum):
     nacimiento = "cert_nacimiento"
     estudios = "cert_estudios"
+
+class RolType(str, enum.Enum):
+    admin = "admin"
+    cliente = "cliente"
+
 
 # ----------- AUTH SCHEMAS -----------
 
@@ -21,13 +25,21 @@ class Token(BaseModel):
 
 # ----------- USER SCHEMAS -----------
 
+class LoginUser(BaseModel):
+    correo: str
+    contraseña: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 class UserBase(BaseModel):
     nombre: str
     correo: EmailStr
 
 class UserCreate(UserBase):
     contraseña: str
-    rol: str
+    rol: RolType  
 
 class UserOut(UserBase):
     id: int
@@ -46,13 +58,21 @@ class RequestBase(BaseModel):
     fecha_fin_estudios: Optional[date] = None
     estado: str
 
-class RequestCreate(RequestBase):
-    user_id: int
+class RequestCreate(BaseModel):  
+    tipo: RequestType
+    nombre_usuario: str
+    apellido_usuario: str
+    fecha_nacimiento: Optional[date] = None
+    lugar_estudio: Optional[str] = None
+    fecha_inicio_estudios: Optional[date] = None
+    fecha_fin_estudios: Optional[date] = None
 
 class RequestOut(RequestBase):
     id: int
     user_id: int
 
+    class Config:
+        orm_mode = True
     class Config:
         orm_mode = True
 
