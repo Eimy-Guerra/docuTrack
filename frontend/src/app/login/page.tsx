@@ -7,31 +7,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+  try {
+    const response = await fetch("http://localhost:8000/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        correo: email,
+        contraseña: password
       })
+    })
 
-      const data = await response.json()
+    const data = await response.json()
 
-      if (response.ok) {
-        localStorage.setItem("token", data.access_token)
-        alert("¡Login exitoso!")
-        // Aquí podrías redirigir a /dashboard o mostrar un componente
-      } else {
-        alert(data.detail || "Login fallido")
-      }
-    } catch (error) {
-      alert("Error al conectar con el backend")
+    if (response.ok) {
+      localStorage.setItem("token", data.access_token)
+      alert("¡Login exitoso!")
+    } else {
+      alert(data.detail || "Credenciales incorrectas")
     }
+
+  } catch (error) {
+    alert("Error de conexión con el backend")
   }
+}
+
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form className="bg-white p-8 rounded shadow-md w-96" onSubmit={handleSubmit}>
         <h2 className="text-2xl font-bold mb-6 text-center">Iniciar sesión</h2>
 
