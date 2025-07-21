@@ -54,6 +54,7 @@ class RequestBase(BaseModel):
     nombre_usuario: str
     apellido_usuario: str
     fecha_nacimiento: Optional[date] = None
+    lugar_nacimiento: Optional[str] = None
     lugar_estudio: Optional[str] = None 
     fecha_inicio_estudios: Optional[date] = None
     fecha_fin_estudios: Optional[date] = None
@@ -64,6 +65,7 @@ class RequestCreate(BaseModel):
     nombre_usuario: str
     apellido_usuario: str
     fecha_nacimiento: Optional[date] = None
+    lugar_nacimiento: Optional[str] = None
     lugar_estudio: Optional[str] = None
     fecha_inicio_estudios: Optional[date] = None
     fecha_fin_estudios: Optional[date] = None
@@ -71,10 +73,10 @@ class RequestCreate(BaseModel):
 class RequestOut(RequestBase):
     id: int
     user_id: int
+    archivo_path: Optional[str] = None
 
     class Config:
         orm_mode = True
-    
 
 # ----------- DOCUMENT SCHEMAS -----------
 
@@ -102,6 +104,7 @@ class CertificateBase(BaseModel):
     fecha_inicio_estudios: Optional[date] = None
     fecha_fin_estudios: Optional[date] = None  
     fecha_nacimiento: Optional[date] = None    
+    lugar_nacimiento: Optional[str] = None
 
 class CertificateCreate(CertificateBase):
     request_id: int
@@ -112,4 +115,5 @@ class CertificateOut(CertificateBase):
 
     class Config:
         orm_mode = True
+
 

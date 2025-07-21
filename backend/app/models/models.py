@@ -34,10 +34,11 @@ class Request(Base):
     nombre_usuario = Column(String, nullable=False)
     apellido_usuario = Column(String, nullable=False)
     fecha_nacimiento = Column(Date, nullable=True)
+    lugar_nacimiento = Column(String, nullable=True)
     lugar_estudio = Column(String, nullable=True)
     fecha_inicio_estudios = Column(Date, nullable=True)
     fecha_fin_estudios = Column(Date, nullable=True)
-    estado = Column(String, nullable=False, default="pendiente")
+    estado = Column(String, nullable=False, default=EstadoRequest.pendiente)
 
     user_id = Column(Integer, ForeignKey("users.id"))
     usuario = relationship("User", back_populates="requests")
@@ -67,10 +68,13 @@ class Certificate(Base):
     lugar_estudio = Column(String, nullable=True)
     fecha_inicio_estudios = Column(Date, nullable=True)
     fecha_fin_estudios = Column(Date, nullable=True)  
-    fecha_nacimiento = Column(Date, nullable=True)    
+    fecha_nacimiento = Column(Date, nullable=True)
+    lugar_nacimiento = Column(String, nullable=True)    
 
     request_id = Column(Integer, ForeignKey("requests.id"))
     request = relationship("Request", back_populates="certificate")
 
+
+archivo_path = Column(String, nullable=True)
 
 
