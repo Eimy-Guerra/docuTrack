@@ -51,6 +51,35 @@ export default function SeguimientoPage() {
       })
   }, [])
 
+  const descargarCertificado = async (id: number) => {
+    const token = localStorage.getItem("token")
+    if (!token) return alert("No estás autenticada")
+
+    try {
+      const res = await fetch(`http://localhost:8000/requests/${id}/certificado`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        alert(error.detail || "No se pudo descargar el certificado")
+        return
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "certificado.pdf"
+      link.click()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      alert("Error al conectar con el servidor")
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-700">
@@ -102,14 +131,12 @@ export default function SeguimientoPage() {
               {solicitud.estado === "aprobado" && (
                 <div className="mt-4">
                   <p className="font-semibold text-gray-800">📥 Certificado disponible:</p>
-                  <a
-                    href={`http://localhost:8000/requests/${solicitud.id}/certificado`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 inline-block mt-2"
+                  <button
+                    onClick={() => descargarCertificado(solicitud.id)}
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-2"
                   >
                     Descargar PDF
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
