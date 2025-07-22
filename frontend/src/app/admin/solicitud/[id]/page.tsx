@@ -104,7 +104,7 @@ export default function SolicitudDetalle() {
         )}
 
         {solicitud.documento_url && (
-          <div className="mt-4">
+          <div className="mt-6">
             <p className="font-semibold">📄 Documento enviado:</p>
             <a
               href={`http://localhost:8000/${solicitud.documento_url}`}

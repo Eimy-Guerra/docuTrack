@@ -131,6 +131,44 @@ def aprobar_solicitud(
 
     solicitud.estado = EstadoRequest.aprobado
     db.commit()
+
+        # ✅ Generar certificado PDF al aprobar la solicitud
+    carpeta_certificados = "certificados"
+    os.makedirs(carpeta_certificados, exist_ok=True)
+
+    nombre_archivo = f"certificado_{solicitud.id}.pdf"
+    ruta_certificado = os.path.join(carpeta_certificados, nombre_archivo)
+
+    c = canvas.Canvas(ruta_certificado)
+    c.setFont("Helvetica", 12)
+
+    tipo_normalizado = solicitud.tipo.lower()
+    if "nacimiento" in tipo_normalizado:
+        c.drawString(100, 750, " CERTIFICADO DE NACIMIENTO ")
+        c.drawString(100, 720, f"Nombre: {solicitud.nombre_usuario} {solicitud.apellido_usuario}")
+        c.drawString(100, 700, f"Fecha de nacimiento: {solicitud.fecha_nacimiento}")
+        c.drawString(100, 680, f"Lugar de nacimiento: {solicitud.lugar_nacimiento or 'No especificado'}")
+        c.drawString(100, 640, "Este documento certifica el nacimiento registrado en el sistema.")
+    else:
+        c.drawString(100, 750, " CERTIFICADO DE ESTUDIOS ")
+        c.drawString(100, 720, f"Nombre: {solicitud.nombre_usuario} {solicitud.apellido_usuario}")
+        c.drawString(100, 700, f"Fecha de nacimiento: {solicitud.fecha_nacimiento}")
+        c.drawString(100, 680, f"Lugar de estudios: {solicitud.lugar_estudio}")
+        
+        fecha_fin = solicitud.fecha_fin_estudios if solicitud.fecha_fin_estudios else "Actualmente cursando"
+        
+
+        c.drawString(100, 660, f"Desde: {solicitud.fecha_inicio_estudios}")
+        c.drawString(250, 660, f"Hasta: {fecha_fin}")
+        
+        c.drawString(100, 620, "Este documento certifica la aprobación del ciclo académico.")
+
+    # Firma institucional
+    c.drawString(100, 600, "Emitido electrónicamente por el sistema institucional.")
+    c.showPage()
+    c.save()
+
+
     db.refresh(solicitud)
 
     return solicitud

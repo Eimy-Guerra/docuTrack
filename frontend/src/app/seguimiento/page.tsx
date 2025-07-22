@@ -67,7 +67,6 @@ export default function SeguimientoPage() {
 
       <div className="grid gap-6 max-w-3xl mx-auto">
         {solicitudes.map((solicitud) => {
-          // ✅ Corrección aplicada aquí:
           const tipoNormalizado = String(solicitud.tipo || "").toLowerCase().trim()
           const esEstudios = tipoNormalizado.includes("estudio")
 
@@ -98,6 +97,20 @@ export default function SeguimientoPage() {
 
               {!esEstudios && (
                 <p><strong>Fecha de nacimiento:</strong> {solicitud.fecha_nacimiento}</p>
+              )}
+
+              {solicitud.estado === "aprobado" && (
+                <div className="mt-4">
+                  <p className="font-semibold text-gray-800">📥 Certificado disponible:</p>
+                  <a
+                    href={`http://localhost:8000/requests/${solicitud.id}/certificado`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 inline-block mt-2"
+                  >
+                    Descargar PDF
+                  </a>
+                </div>
               )}
             </div>
           )
