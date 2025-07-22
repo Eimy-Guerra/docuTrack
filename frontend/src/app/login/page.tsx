@@ -1,40 +1,42 @@
 'use client'
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+    e.preventDefault()
 
-  try {
-    const response = await fetch("http://localhost:8000/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        correo: email,
-        contraseña: password
+    try {
+      const response = await fetch("http://localhost:8000/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          correo: email,
+          contraseña: password
+        })
       })
-    })
 
-    const data = await response.json()
+      const data = await response.json()
 
-    if (response.ok) {
-      localStorage.setItem("token", data.access_token)
-      alert("¡Login exitoso!")
-    } else {
-      alert(data.detail || "Credenciales incorrectas")
+      if (response.ok) {
+        localStorage.setItem("token", data.access_token)
+        alert("¡Login exitoso!")
+        router.push("/solicitar")
+      } else {
+        alert(data.detail || "Credenciales incorrectas")
+      }
+
+    } catch (error) {
+      alert("Error de conexión con el backend")
     }
-
-  } catch (error) {
-    alert("Error de conexión con el backend")
   }
-}
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

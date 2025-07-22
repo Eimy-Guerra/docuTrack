@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Path, File, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Path, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.models import Request, User, EstadoRequest
@@ -22,9 +22,19 @@ def listar_solicitudes(
     
     return db.query(Request).all()
 
+from fastapi import Form
+
 @router.post("/requests/", response_model=RequestOut)
-def crear_solicitud(
-    solicitud: RequestCreate,
+async def crear_solicitud(
+    tipo: str = Form(...),
+    nombre_usuario: str = Form(...),
+    apellido_usuario: str = Form(...),
+    fecha_nacimiento: str = Form(None),
+    lugar_nacimiento: str = Form(None),
+    lugar_estudio: str = Form(None),
+    fecha_inicio_estudios: str = Form(None),
+    fecha_fin_estudios: str = Form(None),
+    cedula_archivo: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -32,17 +42,28 @@ def crear_solicitud(
         raise HTTPException(status_code=403, detail="Solo los clientes pueden crear solicitudes.")
 
     nueva_solicitud = Request(
-        tipo=solicitud.tipo,
-        nombre_usuario=solicitud.nombre_usuario,
-        apellido_usuario=solicitud.apellido_usuario,
-        fecha_nacimiento=solicitud.fecha_nacimiento,
-        lugar_nacimiento=solicitud.lugar_nacimiento,
-        lugar_estudio=solicitud.lugar_estudio,
-        fecha_inicio_estudios=solicitud.fecha_inicio_estudios,
-        fecha_fin_estudios=solicitud.fecha_fin_estudios,
+        tipo=tipo,
+        nombre_usuario=nombre_usuario,
+        apellido_usuario=apellido_usuario,
+        fecha_nacimiento=fecha_nacimiento,
+        lugar_nacimiento=lugar_nacimiento,
+        lugar_estudio=lugar_estudio,
+        fecha_inicio_estudios=fecha_inicio_estudios,
+        fecha_fin_estudios=fecha_fin_estudios,
         estado="pendiente",
         user_id=current_user.id
     )
+
+    # Guardar archivo de cédula
+    carpeta = "cedulas"
+    os.makedirs(carpeta, exist_ok=True)
+    nombre_archivo = f"cedula_{current_user.id}_{cedula_archivo.filename}"
+    ruta_destino = os.path.join(carpeta, nombre_archivo)
+
+    with open(ruta_destino, "wb") as buffer:
+        buffer.write(await cedula_archivo.read())
+
+    nueva_solicitud.cedula_path = ruta_destino
 
     db.add(nueva_solicitud)
     db.commit()

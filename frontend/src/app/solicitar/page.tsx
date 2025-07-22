@@ -4,10 +4,15 @@ import { useState } from "react"
 
 export default function SolicitudPage() {
   const [nombre, setNombre] = useState("")
+  const [apellido, setApellido] = useState("")
   const [tipo, setTipo] = useState("nacimiento")
-  const [archivo, setArchivo] = useState<File | null>(null)
   const [cursaActualmente, setCursaActualmente] = useState(false)
   const [fechaFin, setFechaFin] = useState("")
+  const [fechaInicio, setFechaInicio] = useState("")
+  const [fechaNacimiento, setFechaNacimiento] = useState("")
+  const [lugarNacimiento, setLugarNacimiento] = useState("")
+  const [cedulaArchivo, setCedulaArchivo] = useState<File | null>(null)
+  const [lugarEstudios, setLugarEstudios] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,18 +23,31 @@ export default function SolicitudPage() {
     }
 
     const formData = new FormData()
-    formData.append("nombre", nombre)
-    formData.append("tipo_certificado", tipo)
-    formData.append("cursa_actualmente", JSON.stringify(cursaActualmente))
-    if (!cursaActualmente && fechaFin) {
-      formData.append("fecha_fin_estudios", fechaFin)
+    formData.append("nombre_usuario", nombre)
+    formData.append("apellido_usuario", apellido)
+    formData.append("tipo", tipo)
+
+    if (tipo === "estudios") {
+      formData.append("lugar_estudio", lugarEstudios)
+      formData.append("fecha_inicio_estudios", fechaInicio)
+      formData.append("cursa_actualmente", JSON.stringify(cursaActualmente))
+
+      if (!cursaActualmente && fechaFin) {
+        formData.append("fecha_fin_estudios", fechaFin)
+      }
     }
-    if (archivo) {
-      formData.append("archivo", archivo)
+
+    if (tipo === "nacimiento") {
+      formData.append("fecha_nacimiento", fechaNacimiento)
+      formData.append("lugar_nacimiento", lugarNacimiento)
+    }
+
+    if (cedulaArchivo) {
+      formData.append("cedula_archivo", cedulaArchivo)
     }
 
     try {
-      const response = await fetch("http://localhost:8000/solicitudes", {
+      const response = await fetch("http://localhost:8000/requests/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
@@ -39,11 +57,10 @@ export default function SolicitudPage() {
 
       const data = await response.json()
       if (response.ok) {
-        alert("Solicitud creada con éxito 🎉")
+        alert("Solicitud creada con éxito")
       } else {
         alert(data.detail || "Error al crear la solicitud")
       }
-
     } catch (err) {
       alert("Error de conexión con el backend")
     }
@@ -54,12 +71,21 @@ export default function SolicitudPage() {
       <form className="bg-white p-8 rounded shadow-md w-full max-w-md" onSubmit={handleSubmit}>
         <h2 className="text-xl font-bold mb-6 text-center">Solicitud de Certificado</h2>
 
-        <label className="block mb-2">Nombre completo:</label>
+        <label className="block mb-2">Nombre:</label>
         <input
           type="text"
           className="w-full p-2 mb-4 border rounded"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          required
+        />
+
+        <label className="block mb-2">Apellido:</label>
+        <input
+          type="text"
+          className="w-full p-2 mb-4 border rounded"
+          value={apellido}
+          onChange={(e) => setApellido(e.target.value)}
           required
         />
 
@@ -75,6 +101,24 @@ export default function SolicitudPage() {
 
         {tipo === "estudios" && (
           <>
+            <label className="block mb-2">Lugar de estudios:</label>
+            <input
+              type="text"
+              className="w-full p-2 mb-4 border rounded"
+              value={lugarEstudios}
+              onChange={(e) => setLugarEstudios(e.target.value)}
+              required
+            />
+
+            <label className="block mb-2">Fecha de inicio de estudios:</label>
+            <input
+              type="date"
+              className="w-full p-2 mb-4 border rounded"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+              required
+            />
+
             <label className="flex items-center mb-2">
               <input
                 type="checkbox"
@@ -99,12 +143,37 @@ export default function SolicitudPage() {
           </>
         )}
 
-        <label className="block mb-2">Archivo adjunto (PDF o JPG):</label>
+        {tipo === "nacimiento" && (
+          <>
+            <label className="block mb-2">Fecha de nacimiento:</label>
+            <input
+              type="date"
+              className="w-full p-2 mb-4 border rounded"
+              value={fechaNacimiento}
+              onChange={(e) => setFechaNacimiento(e.target.value)}
+              required
+            />
+
+            <label className="block mb-2">Lugar de nacimiento:</label>
+            <input
+              type="text"
+              className="w-full p-2 mb-4 border rounded"
+              value={lugarNacimiento}
+              onChange={(e) => setLugarNacimiento(e.target.value)}
+              required
+            />
+          </>
+        )}
+
+        <label className="block mb-2 font-medium text-gray-700">
+          Favor añadir imagen de tu Cédula de Identidad Personal (PDF o JPG):
+        </label>
         <input
           type="file"
           accept=".pdf,.jpg,.jpeg"
-          className="w-full mb-6"
-          onChange={(e) => setArchivo(e.target.files?.[0] || null)}
+          className="w-full mb-6 px-4 py-2 border-2 border-blue-500 bg-blue-50 text-sm text-gray-700 rounded cursor-pointer file:bg-blue-600 file:text-white file:px-4 file:py-2 file:rounded file:border-none file:cursor-pointer"
+          onChange={(e) => setCedulaArchivo(e.target.files?.[0] || null)}
+          required
         />
 
         <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
