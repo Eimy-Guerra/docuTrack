@@ -60,7 +60,25 @@ Frontend disponible en: http://localhost:3000
 La comunicación entre back y front ocurre cuando el frontend hace llamadas a la API del backend usando el puerto correspondiente (localhost:8000)
 
 
-## Acceso y Roles
+### Acceso y Roles
+
+## Inicialización de la Base de Datos (Datos de Ejemplo)
+
+Para facilitar la validación del sistema, se incluye un script que genera datos de prueba automáticos (init_db.py). Este script crea:
+
+- 1 usuario de rol `USER` (Carlos Díaz)
+- 1 usuario de rol `ADMIN` (María Torres)
+- 1 solicitud de certificado tipo nacimiento vinculada a Carlos
+
+## Cómo ejecutar?
+
+1. Asegúrate de tener PostgreSQL activo y configurado correctamente
+2. Instala las dependencias del backend
+3. Activa tu entorno virtual (si usas uno)
+4. Ejecuta el script desde la raíz del proyecto. Es decir: \DocuTrack\backend> python app/init_db.py
+
+
+### Roles
 
  - Usuario estándar: Puede registrarse, iniciar sesión, elegir tipo de solicitud, adjuntar documento, enviar solicitud, hacer seguimiento, y descargar el certificado si fue aprobado.
    Credencial de usuario: Nombre: Carlos Díaz, correo: carlos.cliente@example.com,  contraseña: Cliente456$
