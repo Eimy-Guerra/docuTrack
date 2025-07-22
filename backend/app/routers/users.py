@@ -25,7 +25,7 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 # ----------- CREATE USER -----------
-@router.post("/users/", response_model=schemas.UserOut)
+@router.post("/users/")
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(models.User).filter(models.User.correo == user.correo).first()
     if existing_user:
@@ -40,7 +40,15 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+
+    # 🔐 Generar token al registrar
+    access_token = create_access_token(data={"sub": str(db_user.id)})
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "rol": db_user.rol
+    }
 
 # ----------- GET ALL USERS – SOLO ADMIN -----------
 @router.get("/users/", response_model=list[schemas.UserOut])
