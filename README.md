@@ -75,7 +75,7 @@ Para facilitar la validación del sistema, se incluye un script que genera datos
 1. Asegúrate de tener PostgreSQL activo y configurado correctamente
 2. Instala las dependencias del backend
 3. Activa tu entorno virtual (si usas uno)
-4. Ejecuta el script desde la raíz del proyecto. Es decir: \DocuTrack\backend> python app/init_db.py
+4. Ejecuta el script desde la raíz del proyecto. Es decir: \DocuTrack\backend> python -m app.init_db
 
 
 ### Roles
@@ -91,6 +91,8 @@ Para facilitar la validación del sistema, se incluye un script que genera datos
 ## Mejoras por realizar:
 
 Actualmente el sistema permite a los usuarios adjuntar documentos al enviar sus solicitudes, estos archivos son almacenados en la carpeta /cedulas/ y su ruta se registra en la base de datos bajo el campo archivo_path. Sin embargo, la visualización directa de los documentos desde el panel de administración aún no se encuentra habilitada ya que durante las pruebas de integración, se detectaron inconsistencias relacionadas con el mapeo del campo archivo_path en el esquema de salida. Por limitaciones técnicas y de tiempo durante la fase final de desarrollo, esta funcionalidad queda documentada como pendiente para futuras mejoras.
+
+Otro aspecto a mejorar es el sistema de registro ya que no se puede realizar de manera satifactoria. Probablemente se deba a problemas para validar el token. Por cuestiones de tiempo se optó por omitirlo y probar las funcionalidades del usuario con uno pre-cargado en la base de datos.
 
 
 # Comentario personal

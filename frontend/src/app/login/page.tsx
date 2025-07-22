@@ -27,7 +27,6 @@ export default function LoginPage() {
         localStorage.setItem("token", data.access_token)
         localStorage.setItem("rol", data.rol)
 
-        // Redirección según el rol
         if (data.rol === "admin") {
           window.location.href = "/admin"
         } else {
@@ -43,7 +42,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-6">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 p-6">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">Inicio de Sesión</h2>
 
@@ -77,6 +76,13 @@ export default function LoginPage() {
           Accede como cliente o administrador según tus credenciales.
         </p>
       </form>
+
+      <button
+        onClick={() => (window.location.href = "/registro")}
+        className="mt-4 text-blue-600 hover:underline text-sm"
+      >
+        ¿No tienes cuenta? Regístrate aquí
+      </button>
     </div>
   )
 }

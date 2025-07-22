@@ -24,10 +24,11 @@ export default function RegistroPage() {
       const data = await response.json()
       setLoading(false)
 
-      if (response.ok && data.message) {
-        alert("Registro exitoso")
-        window.location.href = "/login"
-      } else {
+      if (response.ok && data.access_token && data.rol) {
+      localStorage.setItem("token", data.access_token)
+      localStorage.setItem("rol", data.rol)
+      window.location.href = "/seguimiento"
+      }else {
         alert(data.detail || "Error al registrar")
       }
     } catch {
