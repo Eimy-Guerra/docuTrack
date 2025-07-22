@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import date
 import enum
@@ -73,10 +73,11 @@ class RequestCreate(BaseModel):
 class RequestOut(RequestBase):
     id: int
     user_id: int
-    archivo_path: Optional[str] = None
+    documento_url: Optional[str] = Field(None, alias="archivo_path")
 
     class Config:
         orm_mode = True
+        allow_population_by_field_name = True
 
 # ----------- DOCUMENT SCHEMAS -----------
 

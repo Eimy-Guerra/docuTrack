@@ -9,7 +9,7 @@ class RequestType(str, enum.Enum):
 
 class EstadoRequest(str, enum.Enum):
     pendiente = "pendiente"
-    en_validacion = "en_validación"
+    en_validacion = "en_validacion"
     aprobado = "aprobado"
     rechazado = "rechazado"
     correccion = "corrección"

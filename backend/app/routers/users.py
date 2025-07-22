@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from app.database.database import SessionLocal
 from app.models import models
 from app import schemas
-from app.auth.auth_utils import get_current_user, create_access_token  # ✅ Importar desde nuevo módulo
+from app.auth.auth_utils import get_current_user, create_access_token  
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -109,7 +109,7 @@ def delete_user(
     return {"mensaje": f"Usuario con ID {user_id} eliminado correctamente"}
 
 # ----------- TOKEN -----------
-@router.post("/token", response_model=schemas.Token)
+@router.post("/token")
 def login(
     user_login: schemas.LoginUser,
     db: Session = Depends(get_db)
@@ -119,6 +119,11 @@ def login(
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     access_token = create_access_token(data={"sub": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "rol": user.rol  
+    }
 
 

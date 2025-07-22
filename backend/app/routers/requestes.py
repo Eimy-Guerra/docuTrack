@@ -87,12 +87,9 @@ def obtener_solicitud_individual(
 
     return solicitud
 
+
 @router.put("/requests/{id}/validar", response_model=schemas.RequestOut)
-def validar_solicitud(
-    id: int,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
-):
+def validar_solicitud(id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     if current_user.rol != "admin":
         raise HTTPException(status_code=403, detail="Acceso denegado.")
 
@@ -100,14 +97,15 @@ def validar_solicitud(
     if not solicitud:
         raise HTTPException(status_code=404, detail="Solicitud no encontrada.")
 
-    if solicitud.estado in [EstadoRequest.rechazado, EstadoRequest.aprobado]:
-        raise HTTPException(status_code=400, detail="La solicitud ya fue rechazada o aprobada y no puede modificarse.")
+    if solicitud.estado != EstadoRequest.pendiente:
+        raise HTTPException(status_code=400, detail="Solo se puede validar desde estado 'pendiente'.")
 
     solicitud.estado = EstadoRequest.en_validacion
     db.commit()
     db.refresh(solicitud)
 
     return solicitud
+
 
 @router.put("/requests/{id}/aprobar", response_model=schemas.RequestOut)
 def aprobar_solicitud(
