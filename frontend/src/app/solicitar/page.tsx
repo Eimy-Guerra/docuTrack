@@ -31,7 +31,6 @@ export default function SolicitudPage() {
       formData.append("lugar_estudio", lugarEstudios)
       formData.append("fecha_inicio_estudios", fechaInicio)
       formData.append("cursa_actualmente", JSON.stringify(cursaActualmente))
-
       if (!cursaActualmente && fechaFin) {
         formData.append("fecha_fin_estudios", fechaFin)
       }
@@ -57,7 +56,7 @@ export default function SolicitudPage() {
 
       const data = await response.json()
       if (response.ok) {
-        alert("Solicitud creada con éxito")
+        alert("Solicitud creada con éxito 🎉")
       } else {
         alert(data.detail || "Error al crear la solicitud")
       }
@@ -66,8 +65,14 @@ export default function SolicitudPage() {
     }
   }
 
+  const cerrarSesion = () => {
+    localStorage.removeItem("token")
+    alert("Sesión cerrada")
+    window.location.href = "/login"
+  }
+
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50">
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4">
       <form className="bg-white p-8 rounded shadow-md w-full max-w-md" onSubmit={handleSubmit}>
         <h2 className="text-xl font-bold mb-6 text-center">Solicitud de Certificado</h2>
 
@@ -166,7 +171,7 @@ export default function SolicitudPage() {
         )}
 
         <label className="block mb-2 font-medium text-gray-700">
-          Favor añadir imagen de tu Cédula de Identidad Personal (PDF o JPG):
+          Imagen de tu Cédula (PDF o JPG):
         </label>
         <input
           type="file"
@@ -179,6 +184,19 @@ export default function SolicitudPage() {
         <button type="submit" className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
           Enviar Solicitud
         </button>
+
+        <p className="text-sm text-center mt-4">
+          ¿Ya realizaste una solicitud?{" "}
+          <a href="/seguimiento" className="text-blue-600 hover:underline">
+            Ver estado aquí
+          </a>
+        </p>
+
+        <p className="text-sm text-center mt-2">
+          <button onClick={cerrarSesion} className="text-red-600 hover:underline">
+            Cerrar sesión
+          </button>
+        </p>
       </form>
     </div>
   )

@@ -268,3 +268,9 @@ def generar_certificado_pdf(
 
     return FileResponse(ruta_certificado, media_type='application/pdf', filename=nombre_archivo)
 
+@router.get("/mis-requests/", response_model=list[schemas.RequestOut])
+def listar_mis_solicitudes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return db.query(Request).filter(Request.user_id == current_user.id).all()

@@ -28,6 +28,8 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("token", data.access_token)
         alert("¡Login exitoso!")
+
+        // Redirige a pantalla de solicitudes
         router.push("/solicitar")
       } else {
         alert(data.detail || "Credenciales incorrectas")
@@ -64,6 +66,13 @@ export default function LoginPage() {
         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
           Ingresar
         </button>
+
+        <p className="text-sm text-center mt-4">
+          ¿No tienes cuenta?{" "}
+          <a href="/registro" className="text-blue-600 hover:underline">
+            Regístrate aquí
+          </a>
+        </p>
       </form>
     </div>
   )
