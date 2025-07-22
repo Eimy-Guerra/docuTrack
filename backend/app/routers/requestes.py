@@ -63,7 +63,10 @@ async def crear_solicitud(
     with open(ruta_destino, "wb") as buffer:
         buffer.write(await cedula_archivo.read())
 
-    nueva_solicitud.cedula_path = ruta_destino
+
+    print("🔍 Se recibió archivo:", cedula_archivo.filename)
+
+    nueva_solicitud.archivo_path = ruta_destino
 
     db.add(nueva_solicitud)
     db.commit()

@@ -40,6 +40,8 @@ class Request(Base):
     fecha_fin_estudios = Column(Date, nullable=True)
     estado = Column(String, nullable=False, default=EstadoRequest.pendiente)
 
+    archivo_path = Column(String, nullable=True)
+
     user_id = Column(Integer, ForeignKey("users.id"))
     usuario = relationship("User", back_populates="requests")
 
@@ -75,6 +77,6 @@ class Certificate(Base):
     request = relationship("Request", back_populates="certificate")
 
 
-archivo_path = Column(String, nullable=True)
+
 
 
